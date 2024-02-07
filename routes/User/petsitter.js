@@ -1,6 +1,7 @@
 const express = require('express')
 const router = express.Router()
 const HireSitter = require('../../models/sitterHire')
+const RequestSitter = require('../../models/sitterRequest')
 
 router.post('/sitter/hire', async (req, res) => {
     try {
@@ -23,5 +24,32 @@ router.post('/sitter/hire', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 })
+
+
+
+router.post('/reqsitter/:userId', async (req, res) => {
+    try {
+        const { workHours, services } = req.body;
+        const  userId  = req.params.userId
+
+        // Create a new PetSitter document
+        const newRequest = new RequestSitter({
+            userId,
+            workHours,
+            services,
+           
+        });
+
+        // Save the document to the database
+        await newRequest.save();
+
+        res.status(201).json({ message: 'Data saved successfully' });
+    } catch (error) {
+        console.error('Error saving data:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
 
 module.exports = router;

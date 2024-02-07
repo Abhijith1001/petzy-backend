@@ -66,6 +66,7 @@ const UserList = require('./routes/Petsitter/userlist')
 const Petsitterprofile = require('./routes/Petsitter/profile')
 const HireSitter = require('./routes/User/petsitter')
 const SitterWork = require('./routes/Petsitter/work')
+const Sitterreq = require('./routes/User/petsitter')
 
 connection();
 app.use(
@@ -163,6 +164,7 @@ app.use('/api/listuser',UserList)
 app.use('/api/petsitterprofile',Petsitterprofile)
 app.use('/api/hire',HireSitter)
 app.use('/api/work',SitterWork)
+app.use('/api/sitterreq',Sitterreq)
 
 app.use('/api/doctorcreate',doctorsignup)
 app.use('/api/doclogin/d',doctorlogin)

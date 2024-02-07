@@ -10,22 +10,32 @@ const petsitterSchema = new mongoose.Schema({
   password: { type: String },
   verified: { type: Boolean, default: false },
   image: { type: String },
-  location: { type: String }, 
-  phone: { type: String },    
-	active: { type: Boolean, default: true },
-  about: { type: String },   
-  pet:{ type: String },   
-  experience:{ type: String },   
-  overview:{ type: String },   
+  location: { type: String },
+  phone: { type: String },
+  active: { type: Boolean, default: true },
+  about: { type: String },
+  pet: { type: String },
+  experience: { type: String },
+  overview: { type: String },
+  selectedGig: { type: String, default: null },
+  selectedService: { type: String, default: null }
 });
 
 
 petsitterSchema.methods.generateAuthToken = function () {
-	const token = jwt.sign({ _id: this._id }, process.env.JWTPRIVATEKEYS, {
-		expiresIn: "7d",
-	});
-	return token;
+  const token = jwt.sign({ _id: this._id }, process.env.JWTPRIVATEKEYS, {
+    expiresIn: "7d",
+  });
+  return token;
 };
+
+petsitterSchema.methods.updateSelectedGig = function (selectedGig) {
+  this.selectedGig = selectedGig
+}
+
+petsitterSchema.methods.updateSelectedService = function (selectedService) {
+  this.selectedService = selectedService
+}
 
 
 const Petsitter = mongoose.model("Petsitter", petsitterSchema);

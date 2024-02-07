@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const { User } = require('../../models/user');
 const  HireSitter  = require('../../models/sitterHire');
+const RequestSitter = require('../../models/sitterRequest')
+
 
 router.get('/userList/:petsitterId', async (req, res) => {
     const petsitterId = req.params.petsitterId;
@@ -34,5 +36,22 @@ const getHiredUsersIds = async (petsitterId) => {
         return [];
     }
 };
+
+
+// router.get('/userReq', async (req, res) => {
+//     const petsitterId = req.params.petsitterId;
+
+//     try {
+//         // Get the list of users who have a status other than 'hired' and 'pending' for the specified petsitter
+//         const reqUsers = await RequestSitter.find({
+//             petsitterId,
+//             status: { $in:  } // Include users with 'hired' and 'pending' status
+//         });
+
+//         res.status(200).json(reqUsers);
+//     } catch (error) {
+//         res.status(400).json({ message: 'Cannot fetch user details' });
+//     }
+// });
 
 module.exports = router;
