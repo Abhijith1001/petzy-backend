@@ -19,7 +19,14 @@ router.get("/:petsitterId", async (req, res) => {
             email: petsitter.email,
             location: petsitter.location,
             phone: petsitter.phone,
-        };
+            about: petsitter.about,
+            overview: petsitter.overview,
+            pet: petsitter.pet,
+            experience: petsitter.experience,
+            selectedGig: petsitter.selectedGig,
+            selectedService: petsitter.selectedService,
+          };
+          
         res.status(200).json(petsitterDetails);
 
     } catch (error) {

@@ -2,6 +2,8 @@ require("dotenv").config();
 const express = require("express");
 const session = require('express-session');
 const app = express();
+const server = require("http").createServer(app);
+
 const bodyparser = require('body-parser')
 const cors = require("cors");
 const connection = require("./db");
@@ -67,6 +69,8 @@ const Petsitterprofile = require('./routes/Petsitter/profile')
 const HireSitter = require('./routes/User/petsitter')
 const SitterWork = require('./routes/Petsitter/work')
 const Sitterreq = require('./routes/User/petsitter')
+const doclist = require('./routes/Doctor/doclist')
+const docreqlist = require('./routes/Doctor/booking')
 
 connection();
 app.use(
@@ -83,10 +87,19 @@ app.use(
 
 app.use(express.json());
 app.use(bodyparser.urlencoded({extended:true}))
+
+const io = require("socket.io")(server, {
+	cors: {
+		origin: "*",
+		methods: [ "GET", "POST" ]
+	}
+});
+
 app.use(cors({
-    origin: 'http://localhost:3000', 
+    origin: 'http://localhost:3000', //8081
     credentials: true
 }));
+
 app.use(express.static('public'))
 
 app.use('/images', express.static(path.join(__dirname, 'public/product')));
@@ -169,8 +182,50 @@ app.use('/api/sitterreq',Sitterreq)
 app.use('/api/doctorcreate',doctorsignup)
 app.use('/api/doclogin/d',doctorlogin)
 app.use('/api/doctor',doctor)
+app.use('/api/doclist',doclist)
+app.use('/api/userreqlist',docreqlist)
 
 
+
+
+const userIds = new Map();
+
+io.on('connection', (socket) => {
+  console.log('A user connected');
+
+  socket.on('disconnect', () => {
+    console.log('User disconnected');
+  });
+
+  socket.on('callUser', ({ userToCall, signalData, from, name }) => {
+    io.to(userToCall).emit('callUser', { signal: signalData, from, name });
+  });
+
+  socket.on('answerCall', (data) => {
+    io.to(data.to).emit('callAccepted', data.signal);
+  });
+});
+
+
+
+
+app.get('/videocall', (req, res) => {
+    let id;
+
+    // Check if any user has accessed the /videocall route before
+    if (userIds.size === 0) {
+        // If no user has accessed the route, assign ID "asd123"
+        id = "asd123";
+    } else {
+        // If at least one user has accessed the route, assign ID "123edc"
+        id = "123edc";
+    }
+
+    // Store the user's ID
+    userIds.set(id, true);
+
+    res.send(` ${id}`);
+});
 
 
 app.get("/api/getkey",(req,res)=>res.status(200).json({key: process.env.RAZORPAY_API_KEY}))

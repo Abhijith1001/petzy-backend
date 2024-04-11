@@ -1,7 +1,9 @@
 const express = require('express');
 const router = express.Router();
 const { User } = require('../../models/user');
-const  HireSitter  = require('../../models/sitterHire');
+const { Petsitter } = require('../../models/petsittinguser');
+
+const HireSitter = require('../../models/sitterHire');
 const RequestSitter = require('../../models/sitterRequest')
 
 
@@ -38,20 +40,43 @@ const getHiredUsersIds = async (petsitterId) => {
 };
 
 
-// router.get('/userReq', async (req, res) => {
-//     const petsitterId = req.params.petsitterId;
 
-//     try {
-//         // Get the list of users who have a status other than 'hired' and 'pending' for the specified petsitter
-//         const reqUsers = await RequestSitter.find({
-//             petsitterId,
-//             status: { $in:  } // Include users with 'hired' and 'pending' status
-//         });
+router.get('/userReq/:petsitterId', async (req, res) => {
+    try {
+        const petsitterId = req.params.petsitterId;
 
-//         res.status(200).json(reqUsers);
-//     } catch (error) {
-//         res.status(400).json({ message: 'Cannot fetch user details' });
-//     }
-// });
+        // Fetch the pet-sitter details to get their workHours and services
+        const petSitter = await Petsitter.findById(petsitterId);
+
+        if (!petSitter) {
+            return res.status(404).json({ error: 'Pet-sitter not found' });
+        }
+
+        console.log('Sitter Work Hours:', petSitter.selectedGig);
+        console.log('Sitter Services:', petSitter.selectedService);
+
+        // Fetch user requests that match the pet-sitter's availability
+        const matchingRequests = await RequestSitter.find({
+            $or: [
+                { workHours: { $eq: petSitter.selectedGig } },
+                { services: { $eq: petSitter.selectedService } }
+            ]
+        });
+
+        console.log('Matching Requests:', matchingRequests);
+
+        res.status(200).json(matchingRequests);
+    } catch (error) {
+        console.error('Error fetching matching requests:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
+    }
+});
+
+
+
+
+
+
+
 
 module.exports = router;
